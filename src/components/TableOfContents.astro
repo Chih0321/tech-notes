@@ -1,0 +1,24 @@
+---
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+const filteredHeadings = headings.filter(h => h.depth <= 3);
+---
+
+<nav class="toc mb-8">
+  <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">本頁目錄</h2>
+  <ul class="space-y-2">
+    {filteredHeadings.map(heading => (
+      <li style={`margin-left: ${(heading.depth - 2) * 1}rem`}>
+        <a
+          href={`#${heading.slug}`}
+          class="text-sm text-gray-600 dark:text-gray-400 hover:text-[var(--accent)] transition-colors"
+        >
+          {heading.text}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const latestPosts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const recentNotes = (await getCollection('notes'))
+  .sort((a, b) => (b.data.lastUpdated?.valueOf() || 0) - (a.data.lastUpdated?.valueOf() || 0))
+  .slice(0, 4);
+---
+
+<BaseLayout title="Raccoon Notes | Home">
+  <section class="py-12 md:py-20 text-center">
+    <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight font-['Outfit'] bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
+      致力於精確與簡約的筆記
+    </h1>
+    <p class="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+      紀錄結構工程、Python 開發與前端技術的點點滴滴。
+    </p>
+    <div class="mt-10 flex justify-center gap-4">
+      <a href="/notes" class="px-8 py-3 bg-[var(--accent)] text-white rounded-lg font-semibold hover:bg-[var(--accent-hover)] transition-all transform hover:scale-105 shadow-lg shadow-blue-500/20">
+        瀏覽筆記
+      </a>
+      <a href="/blog" class="px-8 py-3 bg-white dark:bg-slate-800 border border-[var(--border-color)] rounded-lg font-semibold hover:border-slate-400 transition-all">
+        閱讀部落格
+      </a>
+    </div>
+  </section>
+
+  <div class="grid md:grid-cols-2 gap-12 mt-16">
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold font-['Outfit']">最新文章</h2>
+        <a href="/blog" class="text-sm font-medium text-[var(--accent)] hover:underline">全部文章 &rarr;</a>
+      </div>
+      <div class="space-y-6">
+        {latestPosts.map(post => (
+          <a href={`/blog/${post.id}`} class="block group p-6 rounded-2xl bg-white dark:bg-slate-800 border border-[var(--border-color)] hover:shadow-xl transition-all">
+            <time class="text-xs text-slate-500 block mb-2">{post.data.pubDate.toLocaleDateString('zh-TW')}</time>
+            <h3 class="text-xl font-bold group-hover:text-[var(--accent)] transition-colors mb-2">{post.data.title}</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-sm line-clamp-2">{post.data.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold font-['Outfit']">近期筆記</h2>
+        <a href="/notes" class="text-sm font-medium text-[var(--accent)] hover:underline">瀏覽技術文庫 &rarr;</a>
+      </div>
+      <div class="grid gap-4">
+        {recentNotes.map(note => (
+          <a href={`/notes/${note.id}`} class="p-4 rounded-xl border border-[var(--border-color)] flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">{note.data.category}</span>
+              <span class="font-semibold">{note.data.title}</span>
+            </div>
+            <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>

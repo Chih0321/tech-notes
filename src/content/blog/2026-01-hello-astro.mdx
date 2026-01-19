@@ -1,0 +1,51 @@
+---
+title: "Astro + Tailwind 實戰：打造個人品牌網站"
+description: "本文記錄如何快速整合 Astro 與 Tailwind，並實現高質感的 UI 設計。"
+pubDate: 2026-01-18
+tags: [Astro, Tailwind, Frontend]
+---
+
+## 前言
+
+Astro 是一個非常適合內容導向網站的框架。配合 Tailwind CSS，我們可以非常快速地建構出具備「設計感」的網站。
+
+## 為什麼選擇 Astro？
+
+1. **Zero JS by default**: 只有在需要互動時才加載 JS。
+2. **Content Collections**: 強大的內容管理系統。
+3. **Markdown/MDX 原生支援**: 對工程師極度友善。
+
+## 程式碼範例
+
+下面是一個簡單的 Astro 元件範例：
+
+```astro
+---
+const { title } = Astro.props;
+---
+<div class="card">
+  <h1>{title}</h1>
+  <slot />
+</div>
+
+<style>
+  .card { padding: 1rem; border: 1px solid #ccc; }
+</style>
+```
+
+## 數學公式測試
+
+在 Astro 中，我們可以輕鬆整合 KaTeX 來顯示數學公式。
+
+例如，結構力學中的應力公式：
+$\sigma = \frac{P}{A}$
+
+或是更複雜的區塊公式：
+
+$$
+M_n = A_s f_y (d - a/2)
+$$
+
+## 結論
+
+Astro 是目前建立技術部落格的最佳選擇之一。

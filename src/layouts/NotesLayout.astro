@@ -1,0 +1,35 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+
+interface Props {
+  title: string;
+  headings: { depth: number; slug: string; text: string }[];
+  currentSlug?: string;
+}
+
+const { title, headings, currentSlug } = Astro.props;
+---
+
+<BaseLayout title={title}>
+  <div class="flex flex-col lg:flex-row gap-12">
+    <Sidebar currentSlug={currentSlug} />
+
+    <article class="flex-grow min-w-0">
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold mb-4">{title}</h1>
+      </header>
+
+      <div class="prose prose-slate dark:prose-invert max-w-none">
+        <slot />
+      </div>
+    </article>
+
+    <aside class="hidden xl:block w-56 flex-shrink-0">
+      <div class="sticky top-24">
+        <TableOfContents headings={headings} />
+      </div>
+    </aside>
+  </div>
+</BaseLayout>
