@@ -7,7 +7,7 @@ import rehypeKatex from 'rehype-katex';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.com', // Replace with your actual site URL
+  site: 'https://raccoon-notes.vercel.app', // Replace with your actual site URL
   integrations: [
     mdx({
       remarkPlugins: [remarkMath],

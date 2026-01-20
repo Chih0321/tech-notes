@@ -1,0 +1,102 @@
+---
+title: "SSL 連線問題排除指南：解決公司防火牆下的憑證錯誤"
+description: "在公司或特殊網路環境下，Python (pip/uv) 與 AI CLI 工具常遇到 SSL 憑證報鎖。本文整理了解決這些問題的實戰指令與設定。"
+pubDate: 2026-01-20
+tags: ["SSL", "Python", "DevOps", "Troubleshooting"]
+---
+
+import WarningBox from '../../components/WarningBox.astro';
+
+## 🛑 問題描述
+
+在公司內網等特殊網路環境下，常因防火牆或自簽憑證導致 SSL 錯誤。雖然可請資訊單位處理，但流程往往過於複雜。本文整理針對 Python 與 AI 工具的實戰解法。
+
+---
+
+## 🐍 Python 環境設定
+
+### 1. pip / Anaconda 套件安裝
+若 `pip` 安裝套件時遭遇 SSL 憑證問題 [cite: 1]，可透過信任主機參數解決：
+
+```powershell title="Terminal"
+# 設定信任主機以略過 SSL 檢查
+pip3 install --user --trusted-host pypi.org --trusted-host files.pythonhosted.org <套件名稱>
+```
+
+### 2. UV (新一代套件管理)
+
+針對 `uv` 工具，可依情境採取以下措施 ：
+
+#### **情境 A：單次安裝指令**
+
+加上 `--native-tls` 參數強制使用系統憑證 ：
+
+```powershell
+uv python --native-tls install 3.12
+```
+
+#### **情境 B：專案全域設定**
+
+在根目錄建立 `uv.toml` 檔案，內容寫入以下設定，讓後續下載自動走系統憑證 ：
+
+```toml title="uv.toml"
+native-tls = true
+```
+
+<WarningBox type="note">
+**快速建立方式：** 您也可以在 PowerShell 直接執行：
+"native-tls = true" | [cite_start]Out-File -FilePath uv.toml -Encoding utf8
+</WarningBox>
+
+---
+
+## 🤖 AI 工具與 CLI 應用
+
+### 1. 暫時關閉 SSL 檢查 (CLI 模式)
+
+針對 Gemini CLI 等基於 Node.js 的工具，若登入驗證失敗，可暫時關閉環境變數中的驗證 。
+
+<WarningBox type="warning">
+**資安提示：** 建議僅在受信任的內網環境使用此設定。
+</WarningBox>
+
+**PowerShell (僅對當前視窗有效)：**
+
+```powershell
+# 設定環境變數
+$env:NODE_TLS_REJECT_UNAUTHORIZED = "0"
+# 確認生效 (應顯示 0)
+echo $env:NODE_TLS_REJECT_UNAUTHORIZED
+
+```
+
+**Windows CMD：**
+
+```batch
+set NODE_TLS_REJECT_UNAUTHORIZED=0
+echo %NODE_TLS_REJECT_UNAUTHORIZED%
+
+```
+
+### 2. 透過批次檔啟動 GUI 程式 (如 AI Agent)
+
+若編譯器或 AI Agent 無法直接下指令，可透過批次檔先設定變數再啟動程式，讓該程式繼承設定 。
+
+```batch title="Launch-AI-Agent.bat"
+@echo off
+:: 設定環境變數
+set NODE_TLS_REJECT_UNAUTHORIZED=0
+echo SSL Check Disabled.
+
+:: 啟動應用程式 (請依實際路徑修改)
+start "" "C:\Path\To\Your\Antigravity.exe"
+exit
+
+```
+
+---
+
+## 💡 小結
+
+處理 SSL 問題時，優先推薦使用系統憑證 (如 `native-tls`)；若萬不得已需關閉驗證，請務必在工作結束後關閉該終端機視窗，以確保網路安全。
+
