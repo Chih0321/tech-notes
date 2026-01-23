@@ -16,7 +16,7 @@ import WarningBox from '../../components/WarningBox.astro';
 ## 🐍 Python 環境設定
 
 ### 1. pip / Anaconda 套件安裝
-若 `pip` 安裝套件時遭遇 SSL 憑證問題 [cite: 1]，可透過信任主機參數解決：
+若 `pip` 安裝套件時遭遇 SSL 憑證問題，可透過信任主機參數解決：
 
 ```powershell title="Terminal"
 # 設定信任主機以略過 SSL 檢查
@@ -45,7 +45,7 @@ native-tls = true
 
 <WarningBox type="note">
 **快速建立方式：** 您也可以在 PowerShell 直接執行：
-"native-tls = true" | [cite_start]Out-File -FilePath uv.toml -Encoding utf8
+"native-tls = true" | Out-File -FilePath uv.toml -Encoding utf8
 </WarningBox>
 
 ---

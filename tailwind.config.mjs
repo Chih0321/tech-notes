@@ -6,10 +6,11 @@ export default {
             // 這裡可以延伸你的顏色設定，搭配 Starlight
             colors: {
                 // 如果需要自定義顏色可寫在這裡
+                accent: 'var(--accent)',
             }
         },
 	},
 	plugins: [
-        // Starlight 插件通常會自動處理，這裡保持乾淨即可
+        require('@tailwindcss/typography'),
     ],
 }
