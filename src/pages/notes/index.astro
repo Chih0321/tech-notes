@@ -1,42 +1,67 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
 
-const allNotes = await getCollection('notes');
-const categories = [...new Set(allNotes.map(n => n.data.category || 'Other'))].sort();
+const allNotes = await getCollection("notes");
+const categories = [
+  ...new Set(allNotes.map((n) => n.data.category || "Other")),
+].sort();
 ---
 
 <BaseLayout title="技術筆記 | Raccoon Notes">
   <div class="max-w-4xl mx-auto">
     <header class="mb-12">
       <h1 class="text-4xl font-bold mb-4 font-['Outfit']">技術筆記</h1>
-      <p class="text-slate-600 dark:text-slate-400">結構工程與開發工具的深度筆記。</p>
+      <p class="text-slate-600 dark:text-slate-300">
+        結構工程與開發工具的深度筆記。
+      </p>
     </header>
 
     <div class="grid md:grid-cols-2 gap-8">
-      {categories.map(category => (
-        <div class="p-8 rounded-3xl bg-white dark:bg-slate-800 border border-[var(--border-color)] hover:border-blue-300 transition-colors shadow-sm">
-          <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-            <span class="w-2 h-8 bg-blue-500 rounded-full"></span>
-            {category}
-          </h2>
-          <ul class="space-y-3">
-            {allNotes.filter(n => (n.data.category || 'Other') === category).slice(0, 5).map(note => (
-              <li>
-                <a href={`/notes/${note.id}`} class="text-slate-600 dark:text-slate-400 hover:text-[var(--accent)] transition-colors flex items-center justify-between group">
-                  <span>{note.data.title}</span>
-                  <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </a>
-              </li>
-            ))}
-          </ul>
-          {allNotes.filter(n => (n.data.category || 'Other') === category).length > 5 && (
-            <div class="mt-6 pt-6 border-t border-[var(--border-color)]">
-              <span class="text-sm text-slate-400 italic">查看更多...</span>
-            </div>
-          )}
-        </div>
-      ))}
+      {
+        categories.map((category) => (
+          <div class="p-8 rounded-3xl bg-white dark:bg-slate-800 border border-[var(--border-color)] hover:border-blue-300 transition-colors shadow-sm">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+              <span class="w-2 h-8 bg-blue-500 rounded-full" />
+              {category}
+            </h2>
+            <ul class="space-y-3">
+              {allNotes
+                .filter((n) => (n.data.category || "Other") === category)
+                .slice(0, 5)
+                .map((note) => (
+                  <li>
+                    <a
+                      href={`/notes/${note.id}`}
+                      class="text-slate-600 dark:text-slate-300 hover:text-[var(--accent)] transition-colors flex items-center justify-between group"
+                    >
+                      <span>{note.data.title}</span>
+                      <svg
+                        class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </a>
+                  </li>
+                ))}
+            </ul>
+            {allNotes.filter((n) => (n.data.category || "Other") === category)
+              .length > 5 && (
+              <div class="mt-6 pt-6 border-t border-[var(--border-color)]">
+                <span class="text-sm text-slate-400 italic">查看更多...</span>
+              </div>
+            )}
+          </div>
+        ))
+      }
     </div>
   </div>
 </BaseLayout>

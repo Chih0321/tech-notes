@@ -1,4 +1,6 @@
 ---
+import ThemeToggle from './ThemeToggle.astro';
+
 const navItems = [
   { label: '首頁', href: '/' },
   { label: '筆記', href: '/notes' },
@@ -12,16 +14,20 @@ const navItems = [
     <a href="/" class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent font-['Outfit']">
       Raccoon Notes
     </a>
-    <nav>
-      <ul class="flex space-x-6">
-        {navItems.map(item => (
-          <li>
-            <a href={item.href} class="text-sm font-medium hover:text-[var(--accent)] transition-colors">
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <div class="flex items-center space-x-6">
+      <nav>
+        <ul class="flex space-x-6">
+          {navItems.map(item => (
+            <li>
+              <a href={item.href} class="text-sm font-medium hover:text-[var(--accent)] transition-colors text-[var(--text-primary)]">
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div class="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
+      <ThemeToggle />
+    </div>
   </div>
 </header>

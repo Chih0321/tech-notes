@@ -8,6 +8,8 @@
   :root {
     --bg-primary: #ffffff;
     --text-primary: #1a202c;
+    --text-heading: #111827;
+    /* 近純黑 (gray-900) */
     --accent: #3182ce;
     --accent-hover: #2c5282;
     --sidebar-bg: #f7fafc;
@@ -16,13 +18,16 @@
   }
 
   .dark {
-    --bg-primary: #121212;
-    --text-primary: #f7fafc;
-    --accent: #63b3ed;
-    --accent-hover: #4299e1;
-    --sidebar-bg: #1a202c;
-    --card-bg: #2d3748;
-    --border-color: #4a5568;
+    --bg-primary: #020617;
+    --text-primary: #e2e8f0;
+    /* slate-200 (更亮) */
+    --text-heading: #ffffff;
+    /* 強制純白 */
+    --accent: #38bdf8;
+    --accent-hover: #7dd3fc;
+    --sidebar-bg: #0f172a;
+    --card-bg: #1e293b;
+    --border-color: #1e293b;
   }
 
   body {
@@ -31,8 +36,13 @@
     @apply text-[17px] md:text-[18px];
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold tracking-tight text-[var(--text-heading)];
   }
 }
 
@@ -40,6 +50,22 @@
   .prose-custom {
     /* 1. 基礎設定與字體比例 */
     @apply prose prose-slate max-w-none dark:prose-invert;
+
+    /* 1.5 強制覆寫深色模式顏色 (高對比修正) */
+    /* 使用 CSS 原生變數覆寫 tailwind typography 的預設值 */
+    &.dark,
+    .dark & {
+      --tw-prose-body: var(--text-primary);
+      --tw-prose-headings: var(--text-heading);
+      --tw-prose-bold: #ffffff;
+      --tw-prose-links: var(--accent);
+      --tw-prose-quotes: #f8fafc;
+      --tw-prose-code: #f8fafc;
+      --tw-prose-hr: var(--border-color);
+      --tw-prose-th-borders: var(--border-color);
+      --tw-prose-td-borders: var(--border-color);
+    }
+
     /* 2. 間距調整：段落、列表與圖片 */
     @apply leading-relaxed prose-p:my-6 prose-li:my-2 prose-img:my-8;
     /* 3. 標題層級：增加上方留白 */
@@ -49,21 +75,13 @@
 
     /* 5. 🎨 行內程式碼 (Inline Code) 精確樣式 */
     /* 我們使用 :not(pre *) 來確保樣式不會影響到程式碼區塊 */
-    & :not(pre) > code {
-      @apply
-        bg-gray-100
-        dark:bg-gray-800
-        text-[#ea580c]
-        dark:text-[#fb923c]
-        font-semibold
-        rounded
-        px-1.5
-        py-0.5;
+    & :not(pre)>code {
+      @apply bg-gray-100 dark:bg-gray-800 text-[#ea580c] dark:text-[#fb923c] font-semibold rounded px-1.5 py-0.5;
     }
 
     /* 3. 移除 Tailwind 預設引號 (同樣排除 pre) */
-    & :not(pre) > code::before,
-    & :not(pre) > code::after {
+    & :not(pre)>code::before,
+    & :not(pre)>code::after {
       content: none;
     }
 
