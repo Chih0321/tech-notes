@@ -89,5 +89,13 @@
     & pre code {
       @apply bg-transparent p-0 text-inherit font-normal;
     }
+
+    /* 註腳回傳連結樣式 */
+    @apply prose-a:no-underline hover:prose-a:text-accent;
+
+    /* 註腳區塊樣式 */
+    & .footnotes {
+      @apply mt-12 pt-8 border-t border-gray-200 text-sm opacity-80;
+    }
   }
 }

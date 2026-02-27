@@ -1,17 +1,17 @@
+// tailwind.config.mjs
+import typography from '@tailwindcss/typography';
+
 /** @type {import('tailwindcss').Config} */
 export default {
-	darkMode: 'class',
-	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
-	theme: {
-		extend: {
-            // 這裡可以延伸你的顏色設定，搭配 Starlight
-            colors: {
-                // 如果需要自定義顏色可寫在這裡
-                accent: 'var(--accent)',
-            }
-        },
-	},
-	plugins: [
-        require('@tailwindcss/typography'),
-    ],
-}
+  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  theme: {
+    extend: {
+      colors: {
+        accent: 'var(--accent)',
+      },
+    },
+  },
+  plugins: [
+    typography, // 使用 import 進來的變數
+  ],
+};
