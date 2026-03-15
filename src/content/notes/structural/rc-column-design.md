@@ -2,7 +2,7 @@
 title: "RC 柱設計流程"
 category: "Structural"
 order: 1
-lastUpdated: 2026-01-10
+lastUpdated: 2026-01-26
 ---
 
 ## 設計步驟

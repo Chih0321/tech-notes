@@ -1,0 +1,136 @@
+---
+title: "Newmark Beta Method 實作反應譜"
+category: "Structural"
+order: 2
+lastUpdated: 2026-01-26
+---
+
+import WarningBox from '../../../components/WarningBox.astro';
+
+在反應譜擬合中，重要的關鍵是如何有效計算歷時的反應譜。透過 Golang 與 Python 整合，計算出地震加速度歷時的反應譜。
+
+---
+
+## 反應譜概念
+
+反應譜描述的是無數個單自由度 (SDOF) 系統，在同一個地表加速度歷時 (Ground Motion History)作用下，其最大反應值（最大位移 $S_d$、最大速度 $S_v$ 或最大加速度 $S_a$）與該系統自然週期 (Period, T) 之間的關係。
+
+### 地震反應譜概念
+
+1. 假想有數個週期的單自由度結構，阻尼比相同。
+2. 讓地面發生一次地震。
+3. 紀錄每一個單自由度結構在整個地震過程中的最大反應。
+4. 將「週期 $T$」當作 X 軸，「最大振幅」當作 Y 軸畫出來，這就是反應譜。
+
+<WarningBox type="note">
+計算反應譜在程式上的本質就是一個**巨大的迴圈 (Loop)**，針對每一個感興趣的週期 $T$，解一次完整的動力方程式。
+</WarningBox>
+
+## Newmark Beta Method
+
+Newmark-Beta 法是求解結構動力方程式 $M\ddot{u} + C\dot{u} + Ku = -M\ddot{u}_g$ 最經典的數值積分方法。
+
+### 計算假定
+
+- 質量 $M$ 標準化 $M=1$
+- 剛度 $K = \omega^2M = (\frac{2\pi}{T})^2$
+- 阻尼 $C = 2\xi\omega M$
+
+### 增量法計算
+
+增量法是在每一個時間步 $\Delta t$ 內，建立有效剛度 (Effective Stiffness) 與有效荷載增量 (Effective Force Increment) 的線性關係：
+
+$$
+\hat{K} \cdot \Delta u = \Delta \hat{P}
+$$
+
+其中：
+
+- **$\hat{K}$ (有效剛度)**：包含真實剛度 $K$ 以及由質量 $M$ 和阻尼 $C$ 貢獻的動力效應項。
+
+$$
+\hat{K} = K + \frac{1}{\beta \Delta t^2}M + \frac{\gamma}{\beta \Delta t}C
+$$
+
+- **$\Delta \hat{P}$ (有效荷載增量)**：包含外力變化 $\Delta P$ 以及前一時刻速度 $v_i$ 和加速度 $a_i$ 造成的慣性力項。
+
+解出位移增量 $\Delta u$ 後，再利用 Newmark 假設更新速度與加速度。
+
+### Newmark Beta 法選擇
+
+為確保無條件穩定，計算上通常選擇**平均加速度法**設定參數：
+
+- $\gamma = 0.5$
+- $\beta = 0.25$
+
+## 程式實現
+
+<WarningBox type="tip">
+反應譜在電算中是龐大的迴圈計算量，本筆記這裡選擇 `golang` 實作，過往前人多數選擇 `fortran`。
+</WarningBox>
+
+### 計算核心
+
+1. **系統參數**
+
+```go
+m := 1.0
+omega := 2.0 * math.Pi / period
+k := omega * omega * m
+c := 2.0 * dampingRatio * omega * m
+```
+
+2. **Newmark Beta 參數**
+
+```go
+gamma := params.Gamma
+beta := params.Beta
+```
+
+3. **積分常數定義**
+
+$$
+\begin{aligned}
+c_1 &= \frac{1}{\beta (\Delta t)^2}\\
+c_2 &= \frac{\gamma}{\beta \Delta t}\\
+c_3 &= \frac{1}{\beta \Delta t}\\
+c_4 &= \frac{1}{2\beta}\\
+c_5 &= \frac{\gamma}{\beta}\\
+c_6 &= \Delta t \left( \frac{\gamma}{2\beta} - 1 \right)
+\end{aligned}
+$$
+
+積分常數部分，與如何利用公式有關，因此可能對公式替換的不同，積分常數數量或形式會因人而異。
+
+4. **重要參數定義**
+
+有效勁度：$\hat{K} = K + c_1 M + c_2 C$
+
+有效載重增量：$\Delta \hat{P} = \Delta P(t) + \left( c_3 M + c_5 C \right) v_i + \left( c_4 M + c_6 C \right) a_i$
+
+註：$\Delta P(t)$ 為外力變化量，對於地震反應，$P(t) = -M \ddot{u}_g(t)$。
+
+求解增量：$\Delta u = \frac{\Delta \hat{P}}{\hat{K}}$
+
+5. **迴圈求解**
+
+由位移增量求解速度、加速度增量：
+
+- ($\Delta v$) $= c_2 \Delta u - c_5 v_i - c_6 a_i$
+- ($\Delta a$) $= c_1 \Delta u - c_3 v_i - c_4 a_i$
+
+並紀錄最大反應值
+
+### 計算週期
+
+- 程式碼建立了一個外層迴圈，遍歷所有的週期 (Periods)。
+- **頻率取樣策略**：程式碼使用 `df := 1.0 / (float64(LN) * dt)` 來生成頻率點。這意味著它是依據**輸入地震波的頻率解析度**來決定要計算哪些週期的反應譜，這比固定間距（如每 0.1 秒算一點）更科學，能確保不會漏掉地震波中的特定頻率成分。
+
+## 後記
+
+本次以 golang 實作 Newmark beta 法反應譜採 gemini 3 pro 模型實作，基本上是可以直接使用結果，對於程式撰寫非常高效。以前採用 2.5 模型還是需要修正才能獲得正確結果。
+
+## Reference
+
+- [Numerical Integration in Structural Dynamics](https://people.duke.edu/~hpgavin/StructuralDynamics/NumericalIntegration.pdf)
+- [Formulation of the Newmark-β Method](https://www.structuralengineeringsimplified.com/dynamics/nlsdof/newmark)
