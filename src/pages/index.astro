@@ -36,7 +36,7 @@ const recentNotes = (await getCollection("notes"))
       </a>
       <a
         href="/blog"
-        class="px-8 py-3 bg-white dark:bg-slate-700 dark:text-white border border-[var(--border-color)] rounded-lg font-semibold hover:border-slate-400 dark:hover:bg-slate-600 transition-all"
+        class="px-8 py-3 bg-[var(--card-bg)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-lg font-semibold hover:border-[var(--accent)] transition-all"
       >
         閱讀部落格
       </a>
@@ -46,27 +46,27 @@ const recentNotes = (await getCollection("notes"))
   <div class="grid md:grid-cols-2 gap-12 mt-16">
     <section>
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold font-['Outfit']">最新文章</h2>
+        <h2 class="text-2xl font-bold font-['Outfit'] text-[var(--text-heading)]">最新文章</h2>
         <a
           href="/blog"
           class="text-sm font-medium text-[var(--accent)] hover:underline"
           >全部文章 &rarr;</a
         >
       </div>
-      <div class="space-y-6">
+      <div class="space-y-4">
         {
           latestPosts.map((post) => (
             <a
               href={`/blog/${post.id}`}
-              class="block group p-6 rounded-2xl bg-white dark:bg-slate-800 border border-[var(--border-color)] hover:shadow-xl transition-all"
+              class="block group p-5 rounded-2xl bg-[var(--card-bg)] border border-[var(--border-color)] hover:border-[var(--accent)] hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 transition-all duration-200"
             >
-              <time class="text-xs text-slate-500 block mb-2">
+              <time class="text-xs text-slate-400 dark:text-slate-500 block mb-2 font-mono">
                 {post.data.pubDate.toLocaleDateString("zh-TW")}
               </time>
-              <h3 class="text-xl font-bold group-hover:text-[var(--accent)] transition-colors mb-2">
+              <h3 class="text-base font-semibold text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors mb-1.5">
                 {post.data.title}
               </h3>
-              <p class="text-slate-600 dark:text-slate-300 text-sm line-clamp-2">
+              <p class="text-sm text-[var(--text-primary)] opacity-70 line-clamp-2 leading-relaxed">
                 {post.data.description}
               </p>
             </a>
@@ -77,7 +77,7 @@ const recentNotes = (await getCollection("notes"))
 
     <section>
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold font-['Outfit']">近期筆記</h2>
+        <h2 class="text-2xl font-bold font-['Outfit'] text-[var(--text-heading)]">近期筆記</h2>
         <a
           href="/notes"
           class="text-sm font-medium text-[var(--accent)] hover:underline"
@@ -89,16 +89,16 @@ const recentNotes = (await getCollection("notes"))
           recentNotes.map((note) => (
             <a
               href={`/notes/${note.id}`}
-              class="p-4 rounded-xl border border-[var(--border-color)] flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              class="group p-4 rounded-xl bg-[var(--card-bg)] border border-[var(--border-color)] flex items-center justify-between hover:border-[var(--accent)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
             >
               <div>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-300 block">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 block mb-0.5">
                   {note.data.category}
                 </span>
-                <span class="font-semibold">{note.data.title}</span>
+                <span class="font-semibold text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">{note.data.title}</span>
               </div>
               <svg
-                class="w-5 h-5 text-slate-300"
+                class="w-4 h-4 text-slate-400 dark:text-slate-600 group-hover:text-[var(--accent)] group-hover:translate-x-0.5 transition-all flex-shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

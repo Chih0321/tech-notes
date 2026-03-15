@@ -20,8 +20,8 @@ const categories = [
     <div class="grid md:grid-cols-2 gap-8">
       {
         categories.map((category) => (
-          <div class="p-8 rounded-3xl bg-white dark:bg-slate-800 border border-[var(--border-color)] hover:border-blue-300 transition-colors shadow-sm">
-            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+          <div class="p-8 rounded-3xl bg-[var(--card-bg)] border border-[var(--border-color)] hover:border-[var(--accent)] transition-colors shadow-sm">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3 text-[var(--text-heading)]">
               <span class="w-2 h-8 bg-blue-500 rounded-full" />
               {category}
             </h2>
