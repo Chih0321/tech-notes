@@ -1,52 +1,57 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection } from "astro:content";
 
 interface Props {
   currentSlug?: string;
 }
 
 const { currentSlug } = Astro.props;
-const allNotes = await getCollection('notes');
+const allNotes = await getCollection("notes");
 
 // Group notes by category
-const categories = allNotes.reduce((acc, note) => {
-  const category = note.data.category || 'Other';
-  if (!acc[category]) acc[category] = [];
-  acc[category].push(note);
-  return acc;
-}, {} as Record<string, typeof allNotes>);
+const categories = allNotes.reduce(
+  (acc, note) => {
+    const category = note.data.category || "Other";
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(note);
+    return acc;
+  },
+  {} as Record<string, typeof allNotes>,
+);
 
 // Sort categories and notes within categories
 const sortedCategories = Object.keys(categories).sort();
-sortedCategories.forEach(cat => {
+sortedCategories.forEach((cat) => {
   categories[cat].sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
 });
 ---
 
-<aside class="w-full md:w-64 flex-shrink-0 lg:sticky lg:top-24 h-fit">
+<nav class="w-full flex-shrink-0 h-fit pr-4">
   <div class="space-y-8">
-    {sortedCategories.map(category => (
-      <div>
-        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2">
-          {category}
-        </h2>
-        <ul class="space-y-1">
-          {categories[category].map(note => (
-            <li>
-              <a
-                href={`/notes/${note.id}`}
-                class={`block px-2 py-1.5 text-sm rounded-md transition-all ${
-                  currentSlug === note.id
-                    ? 'bg-blue-50 text-blue-700 font-semibold dark:bg-blue-900/30 dark:text-blue-300'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                }`}
-              >
-                {note.data.title}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ))}
+    {
+      sortedCategories.map((category) => (
+        <div>
+          <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2">
+            {category}
+          </h2>
+          <ul class="space-y-1">
+            {categories[category].map((note) => (
+              <li>
+                <a
+                  href={`/notes/${note.id}`}
+                  class={`block px-2 py-1.5 text-sm rounded-md transition-all ${
+                    currentSlug === note.id
+                      ? "bg-blue-50 text-blue-700 font-semibold dark:bg-blue-900/30 dark:text-blue-300"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  {note.data.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
   </div>
-</aside>
+</nav>

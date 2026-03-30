@@ -1,0 +1,11 @@
+{
+  "*.{js,jsx,ts,tsx,astro}": [
+    "prettier --write"
+  ],
+  "*.{md,mdx}": [
+    "prettier --write"
+  ],
+  "*.css": [
+    "prettier --write"
+  ]
+}

@@ -1,7 +1,7 @@
 ---
-import BaseLayout from './BaseLayout.astro';
-import Sidebar from '../components/Sidebar.astro';
-import TableOfContents from '../components/TableOfContents.astro';
+import BaseLayout from "./BaseLayout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import TableOfContents from "../components/TableOfContents.astro";
 
 interface Props {
   title: string;
@@ -13,12 +13,20 @@ const { title, headings, currentSlug } = Astro.props;
 ---
 
 <BaseLayout title={title}>
-  <div class="flex flex-col lg:flex-row gap-12">
-    <Sidebar currentSlug={currentSlug} />
+  <div
+    class="flex flex-col lg:flex-row w-full max-w-screen-2xl mx-auto px-2 md:px-6"
+  >
+    <!-- Left Sidebar -->
+    <div
+      class="lg:w-64 flex-shrink-0 lg:pt-8 lg:pb-12 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto"
+    >
+      <Sidebar currentSlug={currentSlug} />
+    </div>
 
-    <article class="flex-grow min-w-0">
+    <!-- Center Content -->
+    <article class="flex-grow min-w-0 py-8 lg:px-12 max-w-4xl mx-auto">
       <header class="mb-8">
-        <h1 class="text-3xl font-bold mb-4">{title}</h1>
+        <h1 class="text-4xl font-extrabold mb-4 font-['Outfit']">{title}</h1>
       </header>
 
       <div class="prose-custom">
@@ -26,10 +34,11 @@ const { title, headings, currentSlug } = Astro.props;
       </div>
     </article>
 
-    <aside class="hidden xl:block w-56 flex-shrink-0">
-      <div class="sticky top-24">
-        <TableOfContents headings={headings} />
-      </div>
+    <!-- Right ToC -->
+    <aside
+      class="hidden xl:block w-56 flex-shrink-0 pt-8 pb-12 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto pr-2"
+    >
+      <TableOfContents headings={headings} />
     </aside>
   </div>
 </BaseLayout>
