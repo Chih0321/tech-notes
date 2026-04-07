@@ -16,116 +16,252 @@ const recentNotes = (await getCollection("notes"))
 ---
 
 <BaseLayout title="Raccoon Notes | Home">
-  <div class="container mx-auto px-4 py-8 max-w-7xl">
-    <section class="py-12 md:py-20 text-center">
-      <h1
-        class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight font-['Outfit'] bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent"
-      >
-        致力於實用與活化的筆記
-      </h1>
-      <p
-        class="text-xl md:text-2xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed"
-      >
-        紀錄結構工程知識。
-      </p>
-      <div class="mt-10 flex justify-center gap-4">
-        <a
-          href="/notes"
-          class="px-8 py-3 bg-[var(--accent)] text-white rounded-lg font-semibold hover:bg-[var(--accent-hover)] transition-all transform hover:scale-105 shadow-lg shadow-blue-500/20"
-        >
-          瀏覽筆記
-        </a>
-        <a
-          href="/blog"
-          class="px-8 py-3 bg-[var(--card-bg)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-lg font-semibold hover:border-[var(--accent)] transition-all"
-        >
-          閱讀部落格
-        </a>
-      </div>
-    </section>
+  <div class="relative overflow-hidden min-h-screen bg-[var(--bg-primary)]">
+    <!-- Grid Paper Background Effect -->
+    <div
+      class="absolute inset-0 z-0 pointer-events-none opacity-[0.15] dark:opacity-[0.08]"
+      style="background-size: 32px 32px; background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);"
+    >
+    </div>
 
-    <div class="grid md:grid-cols-2 gap-12 mt-16">
-      <section>
-        <div class="flex items-center justify-between mb-6">
-          <h2
-            class="text-2xl font-bold font-['Outfit'] text-[var(--text-heading)]"
-          >
-            最新文章
-          </h2>
-          <a
-            href="/blog"
-            class="text-sm font-medium text-[var(--accent)] hover:underline"
-            >全部文章 &rarr;</a
-          >
-        </div>
-        <div class="space-y-4">
-          {
-            latestPosts.map((post) => (
-              <a
-                href={`/blog/${post.id}`}
-                class="block group p-5 rounded-2xl bg-[var(--card-bg)] border border-[var(--border-color)] hover:border-[var(--accent)] hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <time class="text-xs text-slate-400 dark:text-slate-500 block mb-2 font-mono">
-                  {post.data.pubDate.toLocaleDateString("zh-TW")}
-                </time>
-                <h3 class="text-base font-semibold text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors mb-1.5">
-                  {post.data.title}
-                </h3>
-                <p class="text-sm text-[var(--text-primary)] opacity-70 line-clamp-2 leading-relaxed">
-                  {post.data.description}
-                </p>
-              </a>
-            ))
-          }
-        </div>
-      </section>
+    <!-- Enhanced Dynamic Light Source -->
+    <div
+      id="spotlight"
+      class="absolute inset-0 z-0 pointer-events-none opacity-0 transition-opacity duration-1000 hidden md:block"
+      style="background: radial-gradient(1000px circle at var(--x, 50%) var(--y, 50%), var(--accent) 0%, transparent 70%); mix-blend-mode: soft-light; filter: blur(100px); opacity: 0.25;"
+    >
+    </div>
 
-      <section>
-        <div class="flex items-center justify-between mb-6">
-          <h2
-            class="text-2xl font-bold font-['Outfit'] text-[var(--text-heading)]"
+    <div class="container relative z-10 mx-auto px-4 py-4 max-w-7xl">
+      <section
+        class="py-12 md:py-20 text-center relative flex flex-col items-center"
+      >
+        <!-- Overhead Branding -->
+        <div
+          class="flex items-center gap-4 mb-8 z-20 opacity-0 animate-fade-in-up"
+          style="animation-delay: 100ms; animation-fill-mode: forwards;"
+        >
+          <div class="h-px w-8 bg-[var(--accent)]/30"></div>
+          <span
+            class="text-sm font-bold uppercase tracking-[0.5em] text-[var(--accent)]"
+            >Raccoon Notes</span
           >
-            近期筆記
-          </h2>
+          <div class="h-px w-8 bg-[var(--accent)]/30"></div>
+        </div>
+
+        <!-- Text Title -->
+        <h1
+          id="hero-title"
+          class="text-5xl md:text-7xl font-black mb-6 tracking-tighter bg-gradient-to-b from-[var(--text-heading)] to-[var(--accent)] bg-clip-text text-transparent transition-transform duration-300 ease-out z-20 cursor-default"
+        >
+          工程思維，落實於實踐之中
+        </h1>
+
+        <p
+          class="text-lg md:text-xl text-[var(--text-primary)] opacity-70 max-w-2xl mx-auto leading-relaxed mb-4 z-20"
+        >
+          將知識在真實問題中驗證、應用，並持續沉澱為可用的經驗。
+        </p>
+
+        <!-- Dynamic Tagline -->
+        <div
+          class="flex items-center gap-3 text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-[var(--accent)] opacity-50 mb-10 z-20"
+        >
+          <span>Practical Knowledge</span>
+          <span class="text-[var(--text-primary)] opacity-30">/</span>
+          <span>Engineering</span>
+          <span class="text-[var(--text-primary)] opacity-30">/</span>
+          <span>Problem Solving</span>
+        </div>
+
+        <!-- Refined Banner Image -->
+        <div
+          id="hero-banner"
+          class="relative group z-10 transition-all duration-700 ease-out perspective-1000"
+        >
+          <div
+            class="relative p-2 rounded-[2.5rem] bg-gradient-to-br from-white/10 to-transparent dark:from-white/5 border border-[var(--border-color)]/20 shadow-2xl backdrop-blur-md"
+          >
+            <img
+              src="/banner.png"
+              alt="Raccoon Notes Showcase"
+              class="w-full max-w-4xl h-auto rounded-[2rem] object-cover shadow-2xl transition-transform duration-700 group-hover:scale-[1.01]"
+            />
+          </div>
+          <div
+            class="absolute -bottom-10 inset-x-20 h-20 bg-[var(--accent)]/10 blur-[100px] rounded-full z-0"
+          >
+          </div>
+        </div>
+
+        <div
+          class="flex flex-wrap justify-center gap-4 md:gap-6 mt-12 z-20 pb-12"
+        >
           <a
             href="/notes"
-            class="text-sm font-medium text-[var(--accent)] hover:underline"
-            >瀏覽技術文庫 &rarr;</a
+            class="group relative px-8 py-4 bg-[var(--accent)] text-white rounded-xl font-bold transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[var(--accent)]/20 overflow-hidden"
           >
-        </div>
-        <div class="grid gap-4">
-          {
-            recentNotes.map((note) => (
-              <a
-                href={`/notes/${note.id}`}
-                class="group p-4 rounded-xl bg-[var(--card-bg)] border border-[var(--border-color)] flex items-center justify-between hover:border-[var(--accent)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <div>
-                  <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 block mb-0.5">
-                    {note.data.category}
-                  </span>
-                  <span class="font-semibold text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">
-                    {note.data.title}
-                  </span>
-                </div>
-                <svg
-                  class="w-4 h-4 text-slate-400 dark:text-slate-600 group-hover:text-[var(--accent)] group-hover:translate-x-0.5 transition-all flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </a>
-            ))
-          }
+            <div
+              class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+            >
+            </div>
+            <span class="relative">瀏覽技術筆記</span>
+          </a>
+          <a
+            href="/blog"
+            class="px-8 py-4 bg-[var(--bg-primary)]/40 backdrop-blur-xl text-[var(--text-primary)] border border-[var(--border-color)] rounded-xl font-bold hover:bg-[var(--accent)]/5 hover:border-[var(--accent)] transition-all hover:scale-105 active:scale-95"
+          >
+            閱讀最新文章
+          </a>
         </div>
       </section>
+
+      <div class="grid md:grid-cols-2 gap-16 mt-20 pb-20">
+        <section>
+          <div class="flex items-center justify-between mb-10">
+            <h2
+              class="text-3xl font-black text-[var(--text-heading)] tracking-tight"
+            >
+              最新文章
+            </h2>
+            <a
+              href="/blog"
+              class="group flex items-center gap-2 text-sm font-bold text-[var(--accent)]"
+            >
+              全部文章
+              <span class="group-hover:translate-x-1 transition-transform"
+                >&rarr;</span
+              >
+            </a>
+          </div>
+          <div class="flex flex-col gap-6">
+            {
+              latestPosts.map((post) => (
+                <a
+                  href={`/blog/${post.id}`}
+                  class="block group p-8 rounded-3xl bg-[var(--card-bg)] border border-[var(--border-color)]/50 hover:border-[var(--accent)] hover:shadow-2xl hover:shadow-slate-300/30 hover:-translate-y-2 transition-all duration-500"
+                >
+                  <time class="text-xs text-[var(--var-accent)] font-bold opacity-40 block mb-4 tracking-widest uppercase">
+                    {post.data.pubDate.toLocaleDateString("zh-TW", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    })}
+                  </time>
+                  <h3 class="text-2xl font-bold text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors mb-4 line-clamp-1">
+                    {post.data.title}
+                  </h3>
+                  <p class="text-[var(--text-primary)] opacity-60 line-clamp-2 leading-relaxed text-base">
+                    {post.data.description}
+                  </p>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+
+        <section>
+          <div class="flex items-center justify-between mb-10">
+            <h2
+              class="text-3xl font-black text-[var(--text-heading)] tracking-tight"
+            >
+              近期筆記
+            </h2>
+            <a
+              href="/notes"
+              class="group flex items-center gap-2 text-sm font-bold text-[var(--accent)]"
+            >
+              技術文庫
+              <span class="group-hover:translate-x-1 transition-transform"
+                >&rarr;</span
+              >
+            </a>
+          </div>
+          <div class="flex flex-col gap-5">
+            {
+              recentNotes.map((note) => (
+                <a
+                  href={`/notes/${note.id}`}
+                  class="group p-6 rounded-2xl bg-[var(--card-bg)] border border-[var(--border-color)]/50 flex items-center justify-between hover:border-[var(--accent)] hover:bg-[var(--accent)]/5 hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--accent)] opacity-60">
+                      {note.data.category}
+                    </span>
+                    <span class="text-lg font-bold text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">
+                      {note.data.title}
+                    </span>
+                  </div>
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--accent)]/10 text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-all transform scale-75 group-hover:scale-100">
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.5"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+      </div>
     </div>
   </div>
 </BaseLayout>
+
+<style>
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out;
+  }
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+</style>
+
+<script>
+  const spotlight = document.getElementById("spotlight");
+  const heroTitle = document.getElementById("hero-title");
+  const heroBanner = document.getElementById("hero-banner");
+
+  document.addEventListener("mousemove", (e) => {
+    if (!spotlight) return;
+
+    const { clientX, clientY } = e;
+
+    spotlight.style.setProperty("--x", `${clientX}px`);
+    spotlight.style.setProperty("--y", `${clientY}px`);
+    spotlight.classList.remove("opacity-0");
+
+    // 高級視差與 3D 傾斜互動
+    if (heroTitle) {
+      const moveX = (clientX - window.innerWidth / 2) * 0.015;
+      const moveY = (clientY - window.innerHeight / 2) * 0.015;
+      heroTitle.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    }
+
+    if (heroBanner) {
+      const moveX = (clientX - window.innerWidth / 2) * -0.008;
+      const moveY = (clientY - window.innerHeight / 2) * -0.008;
+      // 增加 3D 傾斜感
+      heroBanner.style.transform = `translate(${moveX}px, ${moveY}px) rotateX(${moveY * -0.5}deg) rotateY(${moveX * 0.5}deg)`;
+    }
+  });
+</script>

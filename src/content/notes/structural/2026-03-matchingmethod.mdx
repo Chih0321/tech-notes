@@ -5,15 +5,15 @@ order: 5
 lastUpdated: 2026-03-29
 ---
 
-import WarningBox from '../../../components/WarningBox.astro';
-
-
+import WarningBox from "../../../components/WarningBox.astro";
 
 動力分析中，無論是反應譜分析法或歷時分析法，皆須依照規範要求將分析地震力調整至規範規定之目標反應譜。在“[現行規範與ASCE差異](./2026-03-differencetwasce)”一文中有提及國內與美國規範的差異。
 對於反應譜擬合過程中影響最大莫過於擬合的準則。ASCE規範僅要求「所有地震的平均值」不低於目標反應譜的 90%，允許不同地震間互補較為合理。國內現行規定「每一筆」的「每一點」都要高於 90%設計反應譜。因此當真實地震具有高度變異性。若要求「每一筆」的「每一點」都要高於 90%，會導致地震波在某些頻率區間被過度放大，遠高於設計需求，造成設計過於保守甚至無法設計
 
-# 擬合方法
+## 擬合方法
+
 國內規範對於擬合方法無明確之規定與定義。惟常見擬合方法分類有：
+
 - 振幅放大法
 - 反應譜法 - 頻率域
 - 反應譜法 - 時間域
@@ -21,24 +21,27 @@ import WarningBox from '../../../components/WarningBox.astro';
 由*鋼筋混凝土建築使用非線性反應歷時分析之性能設計*[^1]報告知國內現行規範較貼近振幅放大法，但可能有過放大情形。實務上反應譜法 - 頻率域較為常見，而根據相關文獻指出反應譜法 - 時間域較有機會保留地震原始特性。參考資料[^2]有
 清楚的各方法介紹，學術上這三大分類會在擬合方法上發展出不同擬合參數的差異，不過原則圍繞這三大分類。
 
-## 振幅放大法
+### 振幅放大法
+
 將真實地震紀錄乘上一個定比係數$SF$（Scale Factor），使其由幾何平均計算出之反應譜接近目標反應譜。使用這方法時，挑選歷時可以參考國震中心[^3]的MSE及SF指標方法選擇適合之地震歷時。
 
-## 反應譜法
+### 反應譜法
+
 可再區分為在頻率域或時間域調整，差異為在擬合調整過程中調整函數的方式。
 惟反應譜法可能改變地震尖峰譜加速度值，導致加速度變異性無法充分考慮，ASCE有針對此方法規定說要高於設計譜110%(垂直不低於設計譜)去平衡。另，國內因無區分方法，故無特別規定。
+
 <WarningBox type="tip">
-部分反應譜法 - 時間域針對這點，在擬合過程中追求保留地震原始特性，以不改變速度與殘留位移特性去調整，可避免此困境。
+  部分反應譜法 -
+  時間域針對這點，在擬合過程中追求保留地震原始特性，以不改變速度與殘留位移特性去調整，可避免此困境。
 </WarningBox>
 
 通常而言頻率域調整，計算較有效率，惟短週期可能擬合不佳。時間域調整計算較耗資源(建立Ｃ矩陣求解)，但整體擬合及特性保留較佳。
-<WarningBox type="note">
-ETABS或SAP2000新版支援反應譜法之功能。[^4]
-</WarningBox>
+
+<WarningBox type="note">ETABS或SAP2000新版支援反應譜法之功能。[^4]</WarningBox>
 
 ## 附記
-相關參考文獻亦可參考[^5][^6][^7]
 
+相關參考文獻亦可參考[^5][^6][^7]
 
 [^1]: 鋼筋混凝土建築使用 非線性反應歷時分析之性能設計 [https://ws.moi.gov.tw/Download.ashx?u=LzAwMS9VcGxvYWQvNDA0L3JlbGZpbGUvOTQ4OS8zMjgxNjEvNzg4ZGE4NWYtYzcxNS00MDZlLWJlNmQtYTRkZjg0NDRlM2EzLnBkZg%3D%3D&n=6Yu8562L5re35Yed5Zyf5bu656+J5L2/55So6Z2e57ea5oCn5Y+N5oeJ5q235pmC5YiG5p6Q5LmL5oCn6IO96Kit6KiI5oiQ5p6c5aCx5ZGKMTEzMTIyNOS/ruatoy5wZGY%3D](https://ws.moi.gov.tw/Download.ashx?u=LzAwMS9VcGxvYWQvNDA0L3JlbGZpbGUvOTQ4OS8zMjgxNjEvNzg4ZGE4NWYtYzcxNS00MDZlLWJlNmQtYTRkZjg0NDRlM2EzLnBkZg%3d%3d&n=6Yu8562L5re35Yed5Zyf5bu656%2bJ5L2%2f55So6Z2e57ea5oCn5Y%2bN5oeJ5q235pmC5YiG5p6Q5LmL5oCn6IO96Kit6KiI5oiQ5p6c5aCx5ZGKMTEzMTIyNOS%2fruatoy5wZGY%3d)
 

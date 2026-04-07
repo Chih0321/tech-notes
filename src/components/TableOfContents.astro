@@ -4,21 +4,52 @@ interface Props {
 }
 
 const { headings } = Astro.props;
-const filteredHeadings = headings.filter(h => h.depth <= 3);
+
+// 過濾掉 H1 (通常是頁面大標題)，只顯示 H2 ~ H4
+const filteredHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+
+// 找出這一組標題中的最小層級，作為對齊基準
+const minDepth =
+  filteredHeadings.length > 0
+    ? Math.min(...filteredHeadings.map((h) => h.depth))
+    : 2;
 ---
 
-<nav class="toc mb-8">
-  <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">本頁目錄</h2>
-  <ul class="space-y-2">
-    {filteredHeadings.map(heading => (
-      <li style={`margin-left: ${(heading.depth - 2) * 1}rem`}>
-        <a
-          href={`#${heading.slug}`}
-          class="text-sm text-gray-600 dark:text-gray-400 hover:text-[var(--accent)] transition-colors"
-        >
-          {heading.text}
-        </a>
-      </li>
-    ))}
+<nav class="toc mb-8 pr-4">
+  <h2
+    class="text-xs font-bold text-[var(--accent)] opacity-40 uppercase tracking-widest mb-6 px-1"
+  >
+    本頁目錄
+  </h2>
+  <ul class="flex flex-col gap-2.5">
+    {
+      filteredHeadings.map((heading) => {
+        const isSubHeading = heading.depth > minDepth;
+        return (
+          <li
+            class={`transition-all duration-200 border-l-2 border-transparent hover:border-[var(--accent)]/30 ${isSubHeading ? "py-0.5" : "py-1"}`}
+            style={`padding-left: ${(heading.depth - minDepth) * 1}rem`}
+          >
+            <a
+              href={`#${heading.slug}`}
+              class={`block leading-snug break-words transition-colors ${
+                isSubHeading
+                  ? "text-[13px] text-[var(--text-primary)] opacity-50 hover:opacity-100 hover:text-[var(--accent)] font-normal"
+                  : "text-sm text-[var(--text-heading)] opacity-80 hover:opacity-100 hover:text-[var(--accent)] font-semibold"
+              }`}
+            >
+              {heading.text}
+            </a>
+          </li>
+        );
+      })
+    }
   </ul>
 </nav>
+
+<style>
+  /* 增加柔和的動態指標效果 */
+  .toc ul li {
+    position: relative;
+  }
+</style>
