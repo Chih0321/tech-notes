@@ -1,0 +1,115 @@
+---
+title: "反應譜擬合 - 反應譜法(時間域)"
+category: "Spectrum"
+order: 8
+lastUpdated: 2026-07-20
+---
+
+import WarningBox from "../../../components/WarningBox.astro";
+
+在[反應譜擬合方法](./2026-03-matchingmethod)中提及數個方法。反應譜法(時間域)通常是為了保留原始地震特性，克服傳統擬合中失去特性問題。反應譜法(時間域)以小波函數進行調整，常見擬合中需要去建立Ｃ矩陣及求解，因此反應譜法(時間域)較爲耗時。
+
+以下將基於Al Atik, Linda, 及Norman Abrahamson文獻[^1]修正小波函數方法介紹反應譜法(時間域)。雖然最早相關文獻為Lilhanand, K and Tseng提出[^2]，不過 Al Atik ＆ Abrahamson修正小波函數方法為目前主流程式應用之方法，如RSPMATCH09, SAP2000等皆採用。
+
+<WarningBox type="note">
+  Al Atik ＆
+  Abrahamson[^1]即為替RSPMATCH09發展之擬合方法，後續描述擬合過程爲參考RSPMATCH09之做法。
+</WarningBox>
+
+## 反應譜法(時間域)
+
+反應譜法(時間域)為透過比較目標反應譜與擬合反應譜的各週期點差異，在時間歷時中添加各自對應小波函數進行調正，故為時間域調整。
+
+小波函數擬合方法簡述如下：
+
+1. **計算頻譜誤差 (Spectral Misfit)：** 計算目標反應譜與當前歷時反應譜在特定頻率 $f_{i}$​ 與阻尼下的差值 $ΔR_{i}$​。
+2. **決定調整位置與極性：** 找出單自由度振盪器產生最大反應的時間點 $t_{i}$​ 以及該反應的極性（Polarity，Pi​=1 或 −1）。
+3. **計算小波振幅：** 建立矩陣 C，其元素為各個小波對不同頻率點的影響，並透過解聯立方程式 $b=C^{-1}ΔR$ 求出所需的小波振幅 b。
+4. **疊加調整：** 將計算出的小波疊加到原加速度歷時上：$a_{new}​(t)=a_{old}​(t)+δa(t)$。
+
+### 改良小波函數方法
+
+Al Atik ＆ Abrahamson提出方法為基於Lilhanand ＆ Tseng方法，並加入以下幾點修正改進：
+
+1. **改良型錐狀餘弦小波（Improved Tapered Cosine Wavelet）**
+   - **函數形式：** 由一個餘弦函數與一個高斯（Gaussian）錐狀函數相乘組成。
+   - **數學特性：** 此函數的解析形式經過設計，其積分後的最終速度與位移自然趨近於零。
+   - **優點：**
+     1. **無需基線修正：** 調整後的加速度歷時不會產生速度或位移漂移，大幅提升計算效率。
+     2. **保留非平穩特性：** 能在修正反應譜的同時，保留原始地震波的非平穩特性。
+2. **動態補零 (Dynamic Padding)**
+   為了確保小波函數在積分時真的能歸零，小波需要有足夠的持續時間。如果最大反應發生在地震紀錄的極早期（$t_{i}$​ 很小），小波會被截斷導致漂移。因此要檢查 ti​ 是否小於特定頻率所需的最小值。若是，則在加速度歷時的**開頭補零（Zero-padding）**，將整個地震波向後推移，確保有足夠的時間長度讓小波完整發展，從而完全消除漂移現象。
+3. **偽加速度 (Pseudo-Acceleration)**
+   RSPMATCH舊版程式主要針對真實加速度反應譜，而RSPMATCH09改進了演算法，使其能直接針對偽加速度反應譜（PSA）進行擬合，這更符合基於位移設計（Displacement-based design）或長週期結構設計的需求。公式選擇詳[小波函數中脈衝函數選擇問題](./2026-02-waveletimplusefunction)
+
+### 擬合步驟
+
+1. **各回合擬合頻率區間**  
+   為增加擬合求解數值穩定性，Al Atik ＆ Abrahamson提出分區間擬合策略。
+   擬合關注於`0.1~100Hz`間以對數區間取200點，但實際擬合過程只取`0.1~35Hz`間的169點擬合(認為更高頻對於實際地震影響很小)。
+   - 所採取分段區間為：  
+     Pass 1: 1~35 Hz (短週期 1.0s 以內)  
+     Pass 2: 延伸至 0.5 Hz (2.0s)  
+     Pass 3: 延伸至 0.2 Hz (5.0s)  
+     Pass 4: 延伸至 0.1 Hz (10.0s)
+
+   因此擬合過程中做這4次擬合大步驟。
+
+2. **目標反應譜**  
+   依據現行規範計算設計反應譜，作為擬合用的目標反應譜。
+3. **頻譜誤差計算**  
+   先計算歷時SDOF反應，以Newmark beta method進行計算。  
+   再計算頻譜誤差。在特定頻率 $(\omega_{i})$ 與阻尼比 $(\beta_{i})$ 下，目標反應譜與初始歷時反應譜之間的誤差定義為：
+   $\Delta R_{i}=(Q_{i}-R_{i})P_{i}$ - $Q_{i}$：目標頻譜值 。  
+    - $R_{i}$：當前時間歷時的頻譜值 。  
+    - $P_{i}$：振盪器峰值反應的極性 (若最大反應為正值則為 1，負值則為 -1) 。
+   <WarningBox type="tip">
+     一般反應譜計算僅記錄最大加速度等反應，但小波擬合需要再記錄峰值時間及極性。
+   </WarningBox>
+4. **動態補零**  
+   在執行頻譜匹配時，改良型高斯餘弦小波必須要有足夠長的前置時間使其從零開始，這樣正負半波的面積才能完全抵消，進而保證速度與位移歷時不會產生飄移 (Drift)。這個條件取決於單自由度系統在特定頻率與阻尼下，其反應峰值發生的時間 $t_j$。  
+   根據文獻[^1]中 Figure 3 的迴歸分析，要防止飄移發生，不同頻率 $f$ 下存在一個最小的 $t_j$ 需求值 ： $t_{req} = 3.9223 f^{-0.845}$
+   如果實際的 $t_j$ 小於這個 $t_{req}$，程式就必須在加速度歷時的「最前端」補上適當長度的零陣列 (Zero-padding) ，強制把歷時整體往右平移，直到 $t_j$ 滿足最小需求為止 。
+5. **生成改良型小波**  
+   小波方程式 ： $f_{j}(t)=\cos[\omega_{j}^{\prime}(t-t_{j}+\Delta t_{j})]\exp[-(\frac{t-t_{j}+\Delta t_{j}}{\gamma_{j}})^{2}]$
+   相關參數定義如下：
+   - **阻尼圓頻率**：$\omega_{i}^{\prime}=\omega_{i}\sqrt{1-\beta_{i}^{2}}$ 。
+   - **時間差 $(\Delta t_{j})$**：峰值時間 $t_{j}$ 與小波參考原點的差值，$\Delta t_{j}=\frac{\tan^{-1}[\frac{\sqrt{1-\beta_{j}^{2}}}{\beta_{j}}]}{\omega_{j}^{\prime}}$ 。
+   - **頻率相依持續時間係數 $(\gamma_j)$**：確保小波以零速度與零位移收尾的關鍵，$\gamma(f)=1.178f^{-0.93}$ 。
+6. **建構 C 矩陣**  
+   矩陣 $C$ 是一個 $N \times N$ 的方陣 ($N$ 為目標匹配的頻段數量)。矩陣內的每一個元素 $c_{ij}$ 代表：**單自由度 (SDOF) 系統在第 $i$ 個目標頻率與阻尼下，受到第 $j$ 個調整小波 $f_j(t)$ 激發後，於時間點 $t_i$ (即反應峰值發生的時間) 的反應振幅** 。
+   積分方程式如下：
+   $c_{ij}=\int_{0}^{t_{i}}f_{j}(\tau)h_{i}(t_{i}-\tau)d\tau$
+   - $f_j(\tau)$：第 $j$ 個改良型高斯餘弦小波 。
+   - $h_i(t)$：第 $i$ 個頻率與阻尼的 SDOF 脈衝反應函數 (真加速度或偽加速度) 。
+7. **振幅求解與歷時更新**
+   - 各小波的振幅向量 $b$ 必須透過解線性方程組求得：
+     $b=C^{-1}\delta R$
+   - 合成調整歷時：將求得的振幅 bj​ 乘上對應的小波 fj​(t) 並全部加總，得到總調整歷時 $\delta a(t)=\sum_{j=1}^{N}b_{j}f_{j}(t)$。
+   - 歷時更新：引入鬆弛參數（Relaxation parameter） γ（介於 0 到 1 之間，用來避免修正過猛導致發散） ，更新加速度歷時：$a_{1}(t)=a(t)+\gamma\delta a(t)$。
+   - 反覆迭代：將更新後的歷時 $a_1(t)$視為新的初始歷時，重複上述步驟，直到頻譜誤差滿足預設的容許條件 。
+8. **收斂標準**  
+   與頻率域相同，方法本身無特定收斂標準，以迭代越多較容易具良好擬合。程式中採滿足規範的評比週期區間內收斂至正負10%。另外，因為是分段匹配，避免評比週期誤差收斂導致其餘區間未去擬合，而出現怪異反應譜，故每輪匹配程式設定即使滿足誤差收斂條件，但仍應至少迭代20次以上。
+
+## 心得
+
+在實作時間域擬合過程中，在動態補零中$t_{req}$公式特性 $t_{req} = 3.9223 f^{-0.845}$，容易在高頻出現數值計算誤差，導致無法收斂。參考其他文獻，發現原Al Atik ＆ Abrahamson僅作0.1~35Hz，避免數值問題，如果照現在常見切分計算週期，容易無法收斂。  
+關於分段匹配也很重要，因為是一次全域擬合，導致數值不容易收斂，因此參考原文分段匹配的區間帶也是收斂的重要因素。  
+因此Al Atik ＆ Abrahamson改良方法克服基線飄移修正得問題，但該方法仍存在在數值解算收斂性問題待克服，相關數值問題可以參考另篇GWM演算文獻[^3]，該文獻以克服數值收斂與計算效率問題進行探討，可側面了解到Al Atik ＆ Abrahamson方法在實作過程可能遇到的問題。其餘相關文獻有[^4][^5]
+
+## 結語
+
+反應譜法(時間域)計算上十分繁瑣，而且C矩陣建立與反矩陣求解，如何克服相關計算上數值問題是此方法的關鍵：  
+**優點** 1. 可保留地震原始特性。2. 可得不錯擬合結果。
+
+**缺點** 1. 計算十分繁瑣。2. 擬合未必收斂。
+
+[^1]: Al Atik, Linda, 及Norman Abrahamson. 「An Improved Method for Nonstationary Spectral Matching」. _Earthquake Spectra_ 26, 期 3 (2010): 601–17. [https://doi.org/10.1193/1.3459159](https://doi.org/10.1193/1.3459159).
+
+[^2]: Lilhanand, K and Tseng, W. S., 1987, "Generation of Synthetic Time Histories Compatible with Multiple Damping Response Spectra," SMiRT-9, Lausanne K2/10.
+
+[^3]: A greedy algorithm for wavelet-based time domain response spectrum matching https://www.nrc.gov/docs/ML2313/ML23139A173.pdf
+
+[^4]: Jayamon, Jeena. “Multiple Ground Motion Response Spectrum Match Tool for Use in Response History Analysis.” Structures Congress , 2015, 2497–2509. doi:10.1061/9780784479117.216. https://www.academia.edu/42860886/Multiple_Ground_Motion_Response_Spectrum_Match_Tool_for_Use_in_Response_History_Analysis#outer_page_6
+
+[^5]: Stochastic Model for Earthquake Ground Motion Using Wavelet Packets https://www.jackwbaker.com/Publications/Yamamoto_Baker_(2013)_Simulations,_BSSA.pdf
